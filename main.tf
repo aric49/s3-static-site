@@ -1,14 +1,20 @@
-
+provider "aws" {
+  region = "us-east-1"
+  alias  = "us-east-1"
+}
 //Lookup the main DNS zone by name
 data "aws_route53_zone" "primary_hosted_zone" {
-  name = "${var.enviornment}.${var.dns_hosted_zone_name}"
+  name = "${terraform.workspace}.${var.dns_hosted_zone_name}"
+  provider = aws.us-east-1
 }
 
 data "aws_acm_certificate" "cloudfront_certificate" {
-    //grab the CloudFront certificate in us-east-1
+  domain   = "*.${terraform.workspace}.${dns_hosted_zone_name}"
+  statuses = ["ISSUED"]
 }
 resource "aws_s3_bucket" "website_bucket" {
-  bucket_prefix = "${var.name_prefix}-${var.org_name}-${var.environment}-static-site-bucket"
+    //ssb = static site bucket
+  bucket_prefix = "${var.org_name}-${terraform.workspace}-${var.name_prefix}-ssb"
   acl           = "private"
 
   website {
@@ -48,7 +54,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-  aliases             = [aws_acm_certificate.cert_website.domain_name]
+  aliases             = ["${var.site_name}.${var.terraform_workspace}.${var.dns_hosted_zone_name}"]
 
   custom_error_response {
     error_code         = 404

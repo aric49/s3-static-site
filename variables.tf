@@ -27,12 +27,12 @@ variable "tags" {
 }
 
 variable "site_name" {
-  description = "The name of the certificate and address for the site"
+  description = "The primary address for the site"
   type        = string
 
 }
 
-variable "environment" {
-  description = "The environment of the site. dev, stage, preprod, prod"
-  type        = string
+variable "certificate_domain" {
+    description = "The domain of the SSL certificate to lookup"
+    type = string
 }
